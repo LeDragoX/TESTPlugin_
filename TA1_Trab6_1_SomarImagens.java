@@ -1,0 +1,110 @@
+import java.awt.AWTEvent;
+import java.awt.Font;
+
+import ij.IJ;
+import ij.ImagePlus;
+import ij.WindowManager;
+import ij.gui.DialogListener;
+import ij.gui.GenericDialog;
+import ij.plugin.PlugIn;
+import ij.process.ImageProcessor;
+
+public class TA1_Trab6_1_SomarImagens implements PlugIn, DialogListener{
+	
+	ImagePlus imgOriginal1 = IJ.getImage();
+	ImageProcessor processadorOriginal1 = imgOriginal1.getProcessor();
+
+
+	@Override
+	public void run(String arg) {
+		
+		GenericDialog janela = new GenericDialog("Adjust Image");
+		janela.addDialogListener(this);
+		String[] strategies = {"Truncamento","Normalização","Wrapping"};
+		
+		
+		for (int i = 0; i < WindowManager.getIDList().length; i++) {
+			System.out.println("Img[%d] ID[%d]: %s".formatted(i, WindowManager.getIDList()[i], WindowManager.getImageTitles()[i]));
+		}
+		System.out.println("\n");
+		
+		janela.addMessage("Descrição: esse PlugIn irá Somar 2 imagens em 8-bit.");
+		janela.addRadioButtonGroup("Tratamento de overflow\n", strategies, 3, 1, strategies[0]);
+		janela.showDialog();
+		
+		if (janela.wasCanceled()) {
+			System.out.println("Cancelled");
+			processadorOriginal1.reset();
+			imgOriginal1.updateAndDraw();
+		} else {
+			System.out.println("Ok");
+			String selectedStrategy = janela.getNextRadioButton();
+			if (selectedStrategy.equals(strategies[0])) {
+				System.out.println("Botão %s selecionado".formatted(selectedStrategy));
+			} else if (selectedStrategy.equals(strategies[1])) {
+				System.out.println("Botão %s selecionado".formatted(selectedStrategy));
+			} else if (selectedStrategy.equals(strategies[2])) {
+				System.out.println("Botão %s selecionado".formatted(selectedStrategy));
+			}
+			adjustImage(strategies ,selectedStrategy);
+		}
+	}
+	
+	@Override
+	public boolean dialogItemChanged(GenericDialog janela, AWTEvent e) {
+		if (janela.wasCanceled()) {
+			return false;			
+		}
+		
+		processadorOriginal1.reset();
+		
+		return true;
+	}
+
+	private void adjustImage(String[] strategies, String selectedStrategy) {
+		int[] grayPixels = new int[2];
+				
+		WindowManager.putBehind();
+		ImagePlus imgOriginal2 = IJ.getImage();
+		ImageProcessor processadorOriginal2 = imgOriginal2.getProcessor();
+		
+		ImagePlus imgSum = IJ.createImage("Processed image", "8-bit", imgOriginal1.getWidth(), imgOriginal1.getHeight(), 1);
+		ImageProcessor processorSum = imgSum.getProcessor();
+		
+		for (int x = 0; x < imgOriginal1.getWidth(); x++) {
+			for (int y = 0; y < imgOriginal1.getHeight(); y++) {
+				grayPixels[0] = processadorOriginal1.getPixel(x, y);
+				grayPixels[1] = processadorOriginal2.getPixel(x, y);
+				
+				processorSum.putPixel(x, y, convertPixel(strategies, selectedStrategy, grayPixels));
+			}
+		}
+		
+		imgSum.updateAndDraw();
+		imgSum.show();
+	}
+
+	private int convertPixel(String[] strategies, String selectedStrategy, int[] grayPixels) {
+		// Soma crua dos pixels da img1 e img2
+		int newPixel = grayPixels[0] + grayPixels[1];
+
+		if (selectedStrategy.equals(strategies[0])) { // Truncamento
+			if (newPixel > 255) {
+				newPixel = 255;
+			} else if (newPixel < 0) {
+				newPixel = (-newPixel) - 255;
+			}
+		} else if (selectedStrategy.equals(strategies[1])) { // Normalização
+			//newPixel = ((255/(510-255)) * (newPixel - 255)); // Interseção
+			newPixel = ((255/(255-0)) * (newPixel - 0));
+		} else if (selectedStrategy.equals(strategies[2])) { // Wrapping
+			if (newPixel > 255) {
+				newPixel = newPixel - 255;
+			} else if (newPixel < 0) {
+				newPixel = (-newPixel) - 255;
+			}
+		}
+		
+		return newPixel;
+	}
+}

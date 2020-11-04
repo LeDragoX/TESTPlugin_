@@ -8,7 +8,7 @@ import ij.gui.GenericDialog;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 
-public class TA1_Trab6_1_SomarImagens implements PlugIn, DialogListener{
+public class TA1_Trab6_2_tantofaz implements PlugIn, DialogListener{
 	
 	ImagePlus imgOriginal = IJ.getImage();
 	ImageProcessor processadorOriginal = imgOriginal.getProcessor();
@@ -41,7 +41,6 @@ public class TA1_Trab6_1_SomarImagens implements PlugIn, DialogListener{
 		}
 		
 		processadorOriginal.reset();
-		
 		
 		return true;
 	}

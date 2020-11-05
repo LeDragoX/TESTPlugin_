@@ -124,7 +124,6 @@ public class TA1_Trab5_2_ExpansaoEqualizacao implements PlugIn, DialogListener {
 		int[] quant_pixels = new int[default_range];
 		int grayPixel;
 
-		int[] intensities = new int[default_range];
 		double size = processorOriginal.getWidth() * processorOriginal.getHeight();
 		double[] chance = new double[default_range];
 		double[] accum_chance = new double[default_range];
@@ -136,8 +135,6 @@ public class TA1_Trab5_2_ExpansaoEqualizacao implements PlugIn, DialogListener {
 		for (int i = 0; i < default_range; i++) {
 			quant_pixels[i] = 0;
 			accum_chance[i] = 0;
-			// Preenchendo o vetor de intensidades
-			intensities[i] = i;
 		}
 
 		// Contando o numero de pixels de cada intensidade

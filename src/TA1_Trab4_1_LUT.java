@@ -14,25 +14,22 @@ public class TA1_Trab4_1_LUT implements PlugIn {
 		byte[] g = new byte[256];
 		byte[] b = new byte[256];
 
-		ImagePlus imagemR = IJ.createImage("Image 1", "8-bit", processadorOriginal.getWidth(),
-				processadorOriginal.getHeight(), 1);
+		ImagePlus imagemR = IJ.createImage("Image 1", "8-bit", processadorOriginal.getWidth(), processadorOriginal.getHeight(), 1);
 		ImageProcessor processadorR = imagemR.getProcessor();
 
-		ImagePlus imagemG = IJ.createImage("Image 2", "8-bit", processadorOriginal.getWidth(),
-				processadorOriginal.getHeight(), 1);
+		ImagePlus imagemG = IJ.createImage("Image 2", "8-bit", processadorOriginal.getWidth(), processadorOriginal.getHeight(), 1);
 		ImageProcessor processadorG = imagemG.getProcessor();
 
-		ImagePlus imagemB = IJ.createImage("Image 3", "8-bit", processadorOriginal.getWidth(),
-				processadorOriginal.getHeight(), 1);
+		ImagePlus imagemB = IJ.createImage("Image 3", "8-bit", processadorOriginal.getWidth(), processadorOriginal.getHeight(), 1);
 		ImageProcessor processadorB = imagemB.getProcessor();
 
 		for (int w = 0; w < processadorOriginal.getWidth(); w++) {
 			for (int h = 0; h < processadorOriginal.getHeight(); h++) {
 				pixel = processadorOriginal.getPixel(w, h, pixel);
 
-				processadorR.putPixel(w, h, pixel);
-				processadorG.putPixel(w, h, pixel);
-				processadorB.putPixel(w, h, pixel);
+				processadorR.putPixel(w, h, pixel[0]);
+				processadorG.putPixel(w, h, pixel[1]);
+				processadorB.putPixel(w, h, pixel[2]);
 			}
 		}
 

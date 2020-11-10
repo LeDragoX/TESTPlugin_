@@ -7,7 +7,6 @@ public class TA1_Trab4_1_RGB implements PlugIn {
 	public void run(String arg) {
 		ImagePlus imagemOriginal = IJ.getImage();
 
-		// Passa valor RGB na mao
 		ImagePlus imagemR = imagemOriginal.duplicate();
 		imagemR.setTitle("Image 1");
 		modificar_imagem(imagemR, 255, 'r');
@@ -20,8 +19,6 @@ public class TA1_Trab4_1_RGB implements PlugIn {
 		imagemB.setTitle("Image 3");
 		modificar_imagem(imagemB, 255, 'b');
 
-		// Fechar imagem principal
-		// imagem.close();
 	}
 
 	public void modificar_imagem(ImagePlus imagem, int valorRGB, char canal_RGB) {

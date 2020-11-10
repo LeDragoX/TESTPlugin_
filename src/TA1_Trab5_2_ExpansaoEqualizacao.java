@@ -127,7 +127,7 @@ public class TA1_Trab5_2_ExpansaoEqualizacao implements PlugIn, DialogListener {
 		double size = processorOriginal.getWidth() * processorOriginal.getHeight();
 		double[] chance = new double[default_range];
 		double[] accum_chance = new double[default_range];
-		double new_range = 128;
+		double new_range = 255;
 		double[] ranged_chance = new double[default_range];
 		int[] new_intensities = new int[default_range];
 

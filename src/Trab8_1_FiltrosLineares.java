@@ -22,7 +22,7 @@ public class Trab8_1_FiltrosLineares implements PlugIn, DialogListener {
 		janela.addDialogListener(this);
 		String[] strategies = { "Passa-baixas de média (Suaviza)", "Passa-altas (Realça)", "Filtros de borda" };
 
-		janela.addMessage("Descrição: esse PlugIn irá realizar filtros lineares em 8-bit.");
+		janela.addMessage("Descrição: esse PlugIn irá realizar filtros lineares em imagens 8-bit.");
 		janela.addRadioButtonGroup("Tipo\n", strategies, 3, 1, strategies[0]);
 		janela.showDialog();
 
@@ -67,9 +67,10 @@ public class Trab8_1_FiltrosLineares implements PlugIn, DialogListener {
 		for (int x = 1; x < imgOriginal1.getWidth() - 1; x++) {
 			for (int y = 1; y < imgOriginal1.getHeight() - 1; y++) {
 				grayPixel = processadorOriginal1.getPixel(x, y);
-				initNearbyPixels(nearbyPixels, size, x, y);
+				nearbyPixels = initNearbyPixels(nearbyPixels, size, x, y);
 				
-				System.out.println("W: %d H: %d".formatted(x+1, y+1));
+				System.out.println("\nW: %d H: %d\n".formatted(x+1, y+1));
+				processadorModificado.putPixel(x, y, convertPixel(strategies, selectedStrategy, grayPixel, nearbyPixels));
 			}
 		}
 
@@ -77,21 +78,6 @@ public class Trab8_1_FiltrosLineares implements PlugIn, DialogListener {
 		imgModificada.show();
 	}
 
-	private int convertPixel(String[] strategies, String selectedStrategy, int grayPixel) {
-		int newPixel = 0;
-
-		if (selectedStrategy.equals(strategies[0])) { // Passa-baixas de média
-			
-		} else if (selectedStrategy.equals(strategies[1])) { // Passa-altas
-			System.out.println("Novo Pixel: %d".formatted(newPixel));
-			
-		} else if (selectedStrategy.equals(strategies[2])) { // Filtros de borda
-			
-		}
-
-		return newPixel;
-	}
-	
 	public int[][] initNearbyPixels(int[][] nearbyPixels, int size, int x, int y) {
 		int counter = 0;
 		
@@ -99,11 +85,71 @@ public class Trab8_1_FiltrosLineares implements PlugIn, DialogListener {
 			for (int j = y-1; j <= y+1 ; j++) {
 				counter = counter + 1;
 				nearbyPixels[i-(x-1)][j-(y-1)] = processadorOriginal1.getPixel(i, j);
-				System.out.println("(%d, %d) nearbyPixels[%d][%d] = %d | Counter = %d".formatted(x+1, y+1, i-(x-1), j-(y-1), nearbyPixels[i-(x-1)][j-(y-1)], counter));
+				// System.out.println("(%d, %d) nearbyPixels[%d][%d] = %d | Counter = %d".formatted(x+1, y+1, i-(x-1), j-(y-1), nearbyPixels[i-(x-1)][j-(y-1)], counter));
 			}
 		}
-				
-		return nearbyPixels;
 		
+		return nearbyPixels;
 	}
+	
+	private int convertPixel(String[] strategies, String selectedStrategy, int grayPixel, int[][] nearbyPixels) {
+		float newPixel = 0;
+//		 int[][] convolutionMatrix = new int[nearbyPixels.length][nearbyPixels.length];
+
+		if (selectedStrategy.equals(strategies[0])) { // Passa-baixas de média
+			
+			for (int i = 0; i < nearbyPixels.length; i++) {
+				for (int j = 0; j < nearbyPixels.length; j++) {
+					newPixel += nearbyPixels[i][j];
+				}
+			}
+			newPixel = newPixel / (nearbyPixels.length*nearbyPixels.length); // avg/(3*3)
+
+		} else if (selectedStrategy.equals(strategies[1])) { // Passa-altas
+			
+			int[][] convolutionMatrix = {
+										{0, -2, 0}, 
+										{-2, 9, -2}, 
+										{0, -2, 0}
+										};
+			
+//			for (int i = 0; i < nearbyPixels.length; i++) {
+//				for (int j = 0; j < nearbyPixels.length; j++) {
+//					convolutionMatrix[i][j] = 0;
+//				}
+//			}
+//			convolutionMatrix[0][0] = 4;
+//			convolutionMatrix[nearbyPixels.length - 1][nearbyPixels.length - 1] = -4;
+			
+			for (int i = 0; i < nearbyPixels.length; i++) {
+				for (int j = 0; j < nearbyPixels.length; j++) {
+					newPixel += convolutionMatrix[i][j] * nearbyPixels[i][j];
+				}
+			}
+			
+			if (newPixel < 0) {
+				newPixel = 0;
+			}
+						
+		} else if (selectedStrategy.equals(strategies[2])) { // Filtros de borda
+			int[][] convolutionMatrix = {
+										{0, -2, 0}, 
+										{-2, 8, -2}, 
+										{0, -2, 0}
+										};
+						
+			for (int i = 0; i < nearbyPixels.length; i++) {
+				for (int j = 0; j < nearbyPixels.length; j++) {
+					newPixel += convolutionMatrix[i][j] * nearbyPixels[i][j];
+				}
+			}
+			
+			if (newPixel < 0)
+				newPixel = 0;
+		}
+
+		System.out.println("[%s] Novo Pixel: %.2f ~> %d".formatted(selectedStrategy, newPixel, (int) newPixel));
+		return (int) newPixel;
+	}
+	
 }

@@ -1,6 +1,8 @@
 
 import java.awt.AWTEvent;
 import java.awt.Font;
+import java.util.HashMap;
+import java.util.Map;
 
 import ij.IJ;
 import ij.ImagePlus;
@@ -20,9 +22,9 @@ public class Trab8_2_FiltrosNaoLineares implements PlugIn, DialogListener {
 
 		GenericDialog janela = new GenericDialog("Adjust Image");
 		janela.addDialogListener(this);
-		String[] strategies = { "Passa-baixas de média", "Passa-altas", "Filtros de borda" };
+		String[] strategies = { "Mediana", "Máximo", "Moda" };
 
-		janela.addMessage("Descrição: esse PlugIn irá realizar filtros lineares em 8-bit.");
+		janela.addMessage("Descrição: esse PlugIn irá realizar filtros lineares em imagens 8-bit.");
 		janela.addRadioButtonGroup("Tipo\n", strategies, 3, 1, strategies[0]);
 		janela.showDialog();
 
@@ -57,32 +59,20 @@ public class Trab8_2_FiltrosNaoLineares implements PlugIn, DialogListener {
 
 	private void adjustImage(String[] strategies, String selectedStrategy) {
 		int grayPixel;
-		float lowerPixel = 256; // Inicializar maior número possível
-		float higherPixel = -1; // Inicializar menor número possível
+		int size = 3;
+		int[][] nearbyPixels = new int[size][size];
 
 		ImagePlus imgModificada = imgOriginal1.duplicate();
+		imgModificada.setTitle("Linear filtered image");
 		ImageProcessor processadorModificado = imgModificada.getProcessor();		
 		
-		// Encontrar os Pixeis Low e High
-		for (int x = 0; x < imgOriginal1.getWidth(); x++) {
-			for (int y = 0; y < imgOriginal1.getHeight(); y++) {
+		for (int x = 1; x < imgOriginal1.getWidth() - 1; x++) {
+			for (int y = 1; y < imgOriginal1.getHeight() - 1; y++) {
 				grayPixel = processadorOriginal1.getPixel(x, y);
+				nearbyPixels = initNearbyPixels(nearbyPixels, size, x, y);
 				
-				if (grayPixel + grayPixel < lowerPixel) {
-					lowerPixel = grayPixel;
-				}
-				if (grayPixel + grayPixel > higherPixel) {
-					higherPixel = grayPixel;
-				}
-				// System.out.println("Pixel: %d Low= %f High= %f".formatted(grayPixels, lowerPixel, higherPixel));
-			}
-		}
-
-
-		for (int x = 0; x < imgOriginal1.getWidth(); x++) {
-			for (int y = 0; y < imgOriginal1.getHeight(); y++) {
-				grayPixel = processadorOriginal1.getPixel(x, y);
-
+				System.out.println("\nW: %d H: %d\n".formatted(x+1, y+1));
+				processadorModificado.putPixel(x, y, convertPixel(strategies, selectedStrategy, grayPixel, nearbyPixels));
 			}
 		}
 
@@ -90,18 +80,94 @@ public class Trab8_2_FiltrosNaoLineares implements PlugIn, DialogListener {
 		imgModificada.show();
 	}
 
-	private int convertPixel(String[] strategies, String selectedStrategy, int grayPixel, float lowerPixel, float higherPixel) {
-		int newPixel = 0;
+	public int[][] initNearbyPixels(int[][] nearbyPixels, int size, int x, int y) {
+		int counter = 0;
+		
+		for (int i = x-1; i <= x+1 ; i++) {
+			for (int j = y-1; j <= y+1 ; j++) {
+				counter = counter + 1;
+				nearbyPixels[i-(x-1)][j-(y-1)] = processadorOriginal1.getPixel(i, j);
+				// System.out.println("(%d, %d) nearbyPixels[%d][%d] = %d | Counter = %d".formatted(x+1, y+1, i-(x-1), j-(y-1), nearbyPixels[i-(x-1)][j-(y-1)], counter));
+			}
+		}
+		
+		return nearbyPixels;
+	}
+	
+	private int convertPixel(String[] strategies, String selectedStrategy, int grayPixel, int[][] nearbyPixels) {
+		float newPixel = 0;
 
-		if (selectedStrategy.equals(strategies[0])) { // Passa-baixas de média
+		if (selectedStrategy.equals(strategies[0])) { // Mediana
 			
-		} else if (selectedStrategy.equals(strategies[1])) { // Passa-altas
-			System.out.println("Novo Pixel: %d".formatted(newPixel));
+			int[] orderedVector = new int[nearbyPixels.length * nearbyPixels.length];
+			int aux = 0;
+			int counter = 0;
 			
-		} else if (selectedStrategy.equals(strategies[2])) { // Filtros de borda
+			for (int i = 0; i < nearbyPixels.length; i++) {
+				for (int j = 0; j < nearbyPixels.length; j++) {
+					orderedVector[counter] = nearbyPixels[i][j];
+					counter++;
+				}
+			}
 			
+			for (int i = 0; i < orderedVector.length; i++) {
+				for (int j = 0; j < orderedVector.length; j++) {
+					if (orderedVector[i] < orderedVector[j]) {
+						aux = orderedVector[i];
+						orderedVector[i] = orderedVector[j];
+						orderedVector[j] = aux;
+					}
+				}
+			}
+			newPixel = orderedVector[(int) (orderedVector.length/2)];
+			
+			for (int i = 0; i < orderedVector.length; i++) {
+				System.out.println("Ordered Vector[%d]: %d".formatted(i, orderedVector[i]));
+			}
+			
+			// System.out.println("[%s] Novo Pixel[%.2f] ~> [%d]: %d".formatted(selectedStrategy, (float) orderedVector.length/2, (int) orderedVector.length/2, (int) newPixel));
+
+		} else if (selectedStrategy.equals(strategies[1])) { // Máximo
+			
+			newPixel = nearbyPixels[0][0];
+			
+			for (int i = 0; i < nearbyPixels.length; i++) {
+				for (int j = 0; j < nearbyPixels.length; j++) {
+					if (nearbyPixels[i][j] > newPixel) {
+						newPixel = nearbyPixels[i][j];
+					}
+				}
+			}
+						
+		} else if (selectedStrategy.equals(strategies[2])) { // Moda
+			
+			int[] iVector = new int[nearbyPixels.length * nearbyPixels.length];
+			int aux = 0;
+			int counter = 0;
+			
+			for (int i = 0; i < nearbyPixels.length; i++) {
+				for (int j = 0; j < nearbyPixels.length; j++) {
+					iVector[counter] = nearbyPixels[i][j];
+					counter++;
+				}
+			}
+			
+			for (int i = 0; i < iVector.length; i++) {
+				counter = 0;
+				for (int j = 0; j < iVector.length; j++) {
+					if (iVector[i] == iVector[j]) {
+						counter++;
+					}
+				}
+				if (counter >= aux) {
+					aux = counter;
+					newPixel = iVector[i];
+				}
+			}
 		}
 
-		return newPixel;
+		System.out.println("[%s] Novo Pixel: %.2f ~> %d".formatted(selectedStrategy, newPixel, (int) newPixel));
+		return (int) newPixel;
 	}
+	
 }

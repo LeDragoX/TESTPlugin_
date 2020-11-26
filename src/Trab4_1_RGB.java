@@ -1,9 +1,10 @@
+
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 import ij.ImagePlus;
 import ij.IJ;
 
-public class TA1_Trab4_1_RGB implements PlugIn {
+public class Trab4_1_RGB implements PlugIn {
 	public void run(String arg) {
 		ImagePlus imagemOriginal = IJ.getImage();
 

@@ -1,9 +1,10 @@
+
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 import ij.ImagePlus;
 import ij.IJ;
 
-public class TA1_Trab3_Inversao implements PlugIn {
+public class Trab3_1_Inversao implements PlugIn {
 	public void run(String arg) {
 		ImagePlus imgOriginal = IJ.getImage();
 

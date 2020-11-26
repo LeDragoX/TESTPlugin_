@@ -1,3 +1,4 @@
+
 import java.awt.AWTEvent;
 
 import ij.IJ;
@@ -7,7 +8,7 @@ import ij.gui.GenericDialog;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 
-public class TA1_Trab4_3_BrilhoContrasteSolarizacao implements PlugIn, DialogListener {
+public class Trab4_3_BrilhoContrasteSolarizacao implements PlugIn, DialogListener {
 
 	ImagePlus imagemOriginal = IJ.getImage();
 	ImageProcessor processorOriginal = imagemOriginal.getProcessor();

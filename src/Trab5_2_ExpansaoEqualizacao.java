@@ -1,3 +1,4 @@
+
 import java.awt.AWTEvent;
 import ij.IJ;
 import ij.ImagePlus;
@@ -6,7 +7,7 @@ import ij.gui.GenericDialog;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 
-public class TA1_Trab5_2_ExpansaoEqualizacao implements PlugIn, DialogListener {
+public class Trab5_2_ExpansaoEqualizacao implements PlugIn, DialogListener {
 
 	ImagePlus imagemOriginal = IJ.getImage();
 	ImageProcessor processorOriginal = imagemOriginal.getProcessor();

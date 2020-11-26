@@ -1,10 +1,11 @@
+
 import ij.IJ;
 import ij.ImagePlus;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 import ij.process.LUT;
 
-public class TA1_Trab4_1_LUT implements PlugIn {
+public class Trab4_1_LUT implements PlugIn {
 
 	public void run(String arg) {
 		ImagePlus imagemOriginal = IJ.getImage();

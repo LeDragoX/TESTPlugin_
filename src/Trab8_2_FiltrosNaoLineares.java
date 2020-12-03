@@ -1,12 +1,8 @@
 
 import java.awt.AWTEvent;
-import java.awt.Font;
-import java.util.HashMap;
-import java.util.Map;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.WindowManager;
 import ij.gui.DialogListener;
 import ij.gui.GenericDialog;
 import ij.plugin.PlugIn;

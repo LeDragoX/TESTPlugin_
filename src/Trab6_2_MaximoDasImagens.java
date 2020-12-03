@@ -1,6 +1,5 @@
 
 import java.awt.AWTEvent;
-import java.awt.Font;
 
 import ij.IJ;
 import ij.ImagePlus;

@@ -11,12 +11,10 @@ import ij.process.ImageProcessor;
 public class Trab9_1_TecnicasDeMorfologiaBinaria implements PlugIn, DialogListener {
 
 	ImagePlus imgOriginal = IJ.getImage();
-	ImageProcessor processadorBackup = imgOriginal.getProcessor();
+	ImageProcessor processadorBackup = imgOriginal.getProcessor().duplicate();
 
 	@Override
 	public void run(String arg) {
-		imgOriginal.getProcessor().snapshot();
-		
 		GenericDialog janela = new GenericDialog("Adjust Image");
 		janela.addDialogListener(this);
 		String[] strategies = { "Dilatação", "Erosão", "Fechamento (Dilatação + Erosão)", "Abertura (Erosão + Dilatação)", "Borda (outline)" };
@@ -27,7 +25,8 @@ public class Trab9_1_TecnicasDeMorfologiaBinaria implements PlugIn, DialogListen
 
 		if (janela.wasCanceled()) {
 			System.out.println("Cancelled");
-			imgOriginal.getProcessor().reset();
+			
+			imgOriginal.setProcessor(processadorBackup.duplicate());
 			imgOriginal.updateAndDraw();
 		} else {
 			System.out.println("Ok");
